@@ -116,6 +116,7 @@ def calculate_loss(rews, rew_ids, new_rews, save=False):
 
     for i in range(len(new_rews)):
         rews[rew_ids[0][i], rew_ids[1][i]] = new_rews[i]
+
     #
     # rews[rew_ids] = new_rews[:, 0]
 
@@ -139,7 +140,7 @@ def dme():
     global min_loss, min_loss_policy, min_loss_rewards
     save = False
 
-    epochs = 50000
+    epochs = 500000
     rewards = torch.rand(env.num_states, env.num_actions)  # uniformly random rewards
     losses = torch.zeros(epochs, 1)
     for epoch in range(epochs):
@@ -147,7 +148,7 @@ def dme():
         for b_id, batch in enumerate(train_x):
             net.zero_grad()
 
-            reward_ids = train_x_ids[b_id][0] / env.num_actions, train_x_ids[b_id][0] % env.num_actions
+            reward_ids = [(train_x_ids[b_id][0] / env.num_actions).int(), (train_x_ids[b_id][0] % env.num_actions).int()]
             outputs = net(batch)  # forward pass of a batch
             loss, rewards = calculate_loss(rewards, reward_ids, outputs, save)
             save = False
@@ -166,7 +167,7 @@ def dme():
     print(f'esvc: {min_loss_esvc}')
     print(f'emp_fc: {env.emp_fc}')
     plt.plot(range(epochs), losses)
-    plt.show()
+    plt.savefig('result.png')
 
 
 dme()
