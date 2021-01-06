@@ -140,7 +140,7 @@ def dme():
     global min_loss, min_loss_policy, min_loss_rewards
     save = False
 
-    epochs = 500000
+    epochs = 250000
     rewards = torch.rand(env.num_states, env.num_actions)  # uniformly random rewards
     losses = torch.zeros(epochs, 1)
     for epoch in range(epochs):
