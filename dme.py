@@ -15,6 +15,20 @@ import env.grid_4x4_det as env
 
 import matplotlib.pyplot as plt
 
+import os
+import time
+path_identifier = int(time.time())
+result_path = f'results/{path_identifier}/'
+
+try:
+    os.mkdir('results/')
+except OSError:
+    pass
+
+try:
+    os.mkdir(result_path)
+except OSError:
+    pass
 
 torch.autograd.set_detect_anomaly(True)
 
@@ -140,7 +154,7 @@ def dme():
     global min_loss, min_loss_policy, min_loss_rewards
     save = False
 
-    epochs = 250000
+    epochs = 250
     rewards = torch.rand(env.num_states, env.num_actions)  # uniformly random rewards
     losses = torch.zeros(epochs, 1)
     for epoch in range(epochs):
@@ -167,7 +181,7 @@ def dme():
     print(f'esvc: {min_loss_esvc}')
     print(f'emp_fc: {env.emp_fc}')
     plt.plot(range(epochs), losses)
-    plt.savefig('result.png')
+    plt.savefig(result_path+'result.png')
 
 
 dme()

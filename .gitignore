@@ -84,7 +84,6 @@ celerybeat-schedule
 # Environments
 .env
 .venv
-env/
 venv/
 ENV/
 env.bak/
@@ -113,3 +112,4 @@ nohup.out
 data/
 LICENSE
 test_pytorch*
+results/
