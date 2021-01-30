@@ -36,7 +36,7 @@ torch.autograd.set_detect_anomaly(True)
 # device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 device = 'cpu'
 
-avi_range = 10000
+avi_range = 1000
 avi_eps = 0.1
 pp_iter = 50
 min_loss = float('inf')
@@ -154,7 +154,7 @@ def dme():
     global min_loss, min_loss_policy, min_loss_rewards
     save = False
 
-    epochs = 250
+    epochs = 250000
     rewards = torch.rand(env.num_states, env.num_actions)  # uniformly random rewards
     losses = torch.zeros(epochs, 1)
     for epoch in range(epochs):
