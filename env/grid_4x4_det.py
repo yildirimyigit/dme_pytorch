@@ -48,6 +48,7 @@ def prepare_states(all_states, batch_sz):
         batches = []
         batches_ids = []
         shuffled_ids = torch.randperm(num_s)
+
         start_batch = 0
         for _ in range(math.ceil(num_s/batch_sz)):
             batch_ids = shuffled_ids[start_batch:min(start_batch+batch_sz, num_s)]

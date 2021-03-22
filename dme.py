@@ -37,7 +37,7 @@ torch.autograd.set_detect_anomaly(True)
 device = 'cpu'
 
 avi_range = 1000
-avi_eps = 0.1
+avi_eps = 1e-4
 pp_iter = 50
 min_loss = float('inf')
 min_loss_policy, policy_prev = torch.zeros(env.num_states, env.num_actions), torch.zeros(env.num_states, env.num_actions)
@@ -48,9 +48,9 @@ min_loss_esvc, prev_esvc = torch.zeros(env.num_states, 1), torch.zeros(env.num_s
 class Net(nn.Module):
     def __init__(self):
         super().__init__()
-        self.fc1 = nn.Linear(env.d_feature+1, 256)
-        self.fc2 = nn.Linear(256, 256)
-        self.fc3 = nn.Linear(256, 1)
+        self.fc1 = nn.Linear(env.d_feature+1, 300)
+        self.fc2 = nn.Linear(300, 400)
+        self.fc3 = nn.Linear(400, 1)
 
     def forward(self, x):  # x are the features
         x = F.relu(self.fc1(x))
@@ -129,11 +129,11 @@ def calculate_loss(rews, rew_ids, new_rews, save=False):
         min_loss_esvc = prev_esvc
 
     for i in range(len(new_rews)):
-        rews[rew_ids[0][i], rew_ids[1][i]] = new_rews[i]
+        state = (rew_ids[0][0][i] / env.num_actions).int()
+        action = (rew_ids[0][0][i] % env.num_actions).int()
+        rews[state, action] = new_rews[i]
 
-    #
-    # rews[rew_ids] = new_rews[:, 0]
-
+    # ppp = avi(env.states, env.actions, env.transitions, env.forward_transitions, env.rewards, env.goal_ids)
     policy = avi(env.states, env.actions, env.transitions, env.forward_transitions, rews, env.goal_ids)
     policy[policy == torch.tensor(float('inf'))] = 1.79769e+30
     policy /= torch.sum(policy, dim=1).view(-1, 1)
@@ -162,9 +162,10 @@ def dme():
         for b_id, batch in enumerate(train_x):
             net.zero_grad()
 
-            reward_ids = [(train_x_ids[b_id][0] / env.num_actions).int(), (train_x_ids[b_id][0] % env.num_actions).int()]
+            # reward_ids = [(train_x_ids[b_id][0] / env.num_actions).int(),
+            # (train_x_ids[b_id][0] % env.num_actions).int()]
             outputs = net(batch)  # forward pass of a batch
-            loss, rewards = calculate_loss(rewards, reward_ids, outputs, save)
+            loss, rewards = calculate_loss(rewards, train_x_ids, outputs, save)
             save = False
             outputs.backward(loss.view(env.batch_size, 1))
             optimizer.step()
