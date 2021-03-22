@@ -33,8 +33,8 @@ except OSError:
 torch.autograd.set_detect_anomaly(True)
 
 # Device configuration
-# device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-device = 'cpu'
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+# device = 'cpu'
 
 avi_range = 1000
 avi_eps = 1e-4
