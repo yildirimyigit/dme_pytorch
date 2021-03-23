@@ -133,7 +133,6 @@ def calculate_loss(rews, rew_ids, new_rews, save=False):
         action = (rew_ids[0][0][i] % env.num_actions).int()
         rews[state, action] = new_rews[i]
 
-    # ppp = avi(env.states, env.actions, env.transitions, env.forward_transitions, env.rewards, env.goal_ids)
     policy = avi(env.states, env.actions, env.transitions, env.forward_transitions, rews, env.goal_ids)
     policy[policy == torch.tensor(float('inf'))] = 1.79769e+30
     policy /= torch.sum(policy, dim=1).view(-1, 1)
@@ -181,7 +180,7 @@ def dme():
     print(f'rewards: {min_loss_rewards}')
     print(f'esvc: {min_loss_esvc}')
     print(f'emp_fc: {env.emp_fc}')
-    plt.plot(range(epochs), losses)
+    # plt.plot(range(epochs), losses)
     plt.savefig(result_path+'result.png')
 
 
