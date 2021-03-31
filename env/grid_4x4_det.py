@@ -83,15 +83,22 @@ def calculate_emp_fc():
     #                              [[0], [4], [5], [9], [10], [14], [15]], [[0], [1], [5], [6], [10], [11], [15]],
     #                              [[0], [4], [8], [9], [10], [14], [15]], [[0], [1], [2], [6], [10], [11], [15]],
     #                              [[0], [4], [5], [6], [10], [14], [15]], [[0], [1], [5], [9], [13], [14], [15]]])
-    trajectories = torch.tensor([[[0], [4], [8], [12], [13], [14], [15]]])
-    empfc = torch.zeros(num_states)
+    trajectories = torch.tensor([[[sa_to_id(0, 2)], [sa_to_id(4, 2)], [sa_to_id(8, 2)], [sa_to_id(12, 1)],
+                                  [sa_to_id(13, 1)], [sa_to_id(14, 1)], [sa_to_id(15, 1)]]])
+    empfc = torch.zeros(num_states*num_actions)
     for traj in trajectories:
-        for sid in range(num_states):
-            if sid in traj:
-                empfc[sid] += 1
+        for sa_id in range(num_states*num_actions):
+            if sa_id in traj:
+                empfc[sa_id] += 1
 
     empfc = empfc / torch.sum(empfc)
     return empfc
 
 
+def sa_to_id(s, a):
+    return s * num_actions + a
+
+
 emp_fc = calculate_emp_fc()
+
+

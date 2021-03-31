@@ -104,8 +104,9 @@ def avi(s, a, t, ft, r, g_ids):  # ft: forward_transitions
 def policy_prop(s, a, t, bt, pol):
     with torch.no_grad():
         num_s = s.size()[0]
-        esvc = torch.zeros(pp_iter, num_s, requires_grad=True)
-        esvc_cp = torch.zeros(pp_iter, num_s, requires_grad=True)
+        num_a = a.size()[0]
+        esvc = torch.zeros(pp_iter, num_s*num_a, requires_grad=True)
+        esvc_cp = torch.zeros(pp_iter, num_s*num_a, requires_grad=True)
         esvc[0, env.start_id] = 1
         esvc_cp[0, :] = esvc[0, :].clone()
         for i in range(pp_iter-1):
@@ -117,6 +118,7 @@ def policy_prop(s, a, t, bt, pol):
             esvc_cp[i+1, :] = esvc[i+1, :].clone()
         sum_esvc = torch.sum(esvc_cp, dim=0)
         normalized_esvc = sum_esvc / torch.sum(esvc_cp)
+
         return normalized_esvc
 
 
@@ -146,6 +148,8 @@ def calculate_loss(rews, rew_ids, new_rews, save=False):
     # diff = F.mse_loss(exp_svc_norm, env.emp_fc)
     diff = env.emp_fc - exp_svc_norm
 
+    # TODO: emp_fc and esvc in (s, a)
+
     return diff.repeat_interleave(env.num_actions), rews
 
 
@@ -153,7 +157,7 @@ def dme():
     global min_loss, min_loss_policy, min_loss_rewards
     save = False
 
-    epochs = 1000000
+    epochs = 1
     rewards = torch.rand(env.num_states, env.num_actions)  # uniformly random rewards
     losses = torch.zeros(epochs, 1)
     for epoch in range(epochs):
@@ -186,3 +190,10 @@ def dme():
 
 dme()
 # print(net(train_x[0]))
+
+# policy = avi(env.states, env.actions, env.transitions, env.forward_transitions, env.rewards, env.goal_ids)
+# policy[policy == torch.tensor(float('inf'))] = 1.79769e+30
+# policy /= torch.sum(policy, dim=1).view(-1, 1)
+# print(policy)
+
+
