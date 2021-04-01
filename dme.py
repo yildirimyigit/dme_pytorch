@@ -176,11 +176,18 @@ def dme():
             print(f'{epoch}: {sum_loss}')
             losses[epoch] = sum_loss
 
-    print(f'policy: {min_loss_policy}')
-    print(f'rewards: {min_loss_rewards}')
-    print(f'esvc: {min_loss_esvc}')
-    print(f'emp_fc: {env.emp_fc}')
-    # plt.plot(range(epochs), losses)
+#    print(f'policy: {min_loss_policy}')
+#    print(f'rewards: {min_loss_rewards}')
+#    print(f'esvc: {min_loss_esvc}')
+#    print(f'emp_fc: {env.emp_fc}')
+    f = open(result_path+'out.txt', 'a')
+    f.write(f'policy: {min_loss_policy}\n')
+    f.write(f'rewards: {min_loss_rewards}\n')
+    f.write(f'esvc: {min_loss_esvc}\n')
+    f.write(f'emp_fc: {env.emp_fc}\n')
+    f.close()
+
+    plt.plot(range(epochs), losses)
     plt.savefig(result_path+'result.png')
 
 
