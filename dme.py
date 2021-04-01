@@ -105,8 +105,8 @@ def policy_prop(s, a, t, bt, pol):
     with torch.no_grad():
         num_s = s.size()[0]
         num_a = a.size()[0]
-        esvc = torch.zeros(pp_iter, num_s*num_a, requires_grad=True)
-        esvc_cp = torch.zeros(pp_iter, num_s*num_a, requires_grad=True)
+        esvc = torch.zeros(pp_iter, num_s, requires_grad=True)
+        esvc_cp = torch.zeros(pp_iter, num_s, requires_grad=True)
         esvc[0, env.start_id] = 1
         esvc_cp[0, :] = esvc[0, :].clone()
         for i in range(pp_iter-1):
@@ -118,8 +118,9 @@ def policy_prop(s, a, t, bt, pol):
             esvc_cp[i+1, :] = esvc[i+1, :].clone()
         sum_esvc = torch.sum(esvc_cp, dim=0)
         normalized_esvc = sum_esvc / torch.sum(esvc_cp)
+        esvc_sa = torch.flatten(pol*normalized_esvc[:, None])
 
-        return normalized_esvc
+        return esvc_sa
 
 
 def calculate_loss(rews, rew_ids, new_rews, save=False):
@@ -145,19 +146,19 @@ def calculate_loss(rews, rew_ids, new_rews, save=False):
     exp_svc_norm = exp_svc / torch.sum(exp_svc)
     prev_esvc = exp_svc_norm.clone()
 
+    # TODO: emp_fc and esvc in (s, a)
+
     # diff = F.mse_loss(exp_svc_norm, env.emp_fc)
     diff = env.emp_fc - exp_svc_norm
 
-    # TODO: emp_fc and esvc in (s, a)
-
-    return diff.repeat_interleave(env.num_actions), rews
+    return diff, rews
 
 
 def dme():
     global min_loss, min_loss_policy, min_loss_rewards
     save = False
 
-    epochs = 1
+    epochs = 10000
     rewards = torch.rand(env.num_states, env.num_actions)  # uniformly random rewards
     losses = torch.zeros(epochs, 1)
     for epoch in range(epochs):
